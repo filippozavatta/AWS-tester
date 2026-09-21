@@ -1,0 +1,42 @@
+{
+  "diagnostic_machines": {
+
+    "act_pos_min": -10,      "act_pos_max": 10,
+    "set_pos_min": -0.4,      "set_pos_max": 0.4,
+
+    "act_vel_min": -10.0,     "act_vel_max": 10.0,
+    "set_vel_min": -10.0,     "set_vel_max": 10.0,
+
+    "act_acc_min": -50.0,     "act_acc_max": 50.0,
+    "set_acc_min": -50.0,     "set_acc_max": 50.0,
+
+    "act_forc_min": -20000.0,   "act_forc_max": 20000.0,
+    "set_forc_min": -20000.0,   "set_forc_max": 20000.0,
+
+    "dcv_min": 0.0,           "dcv_max": 800,
+    "iq_min": -500.0,         "iq_max": 500.0,
+    "ibatt_min": -500.0,      "ibatt_max": 500.0,
+
+    "str_v0_min": 0.0,        "str_v0_max": 900.0,
+    "str_v1_min": 0.0,        "str_v1_max": 900.0,
+
+    "min_v0_min": 0.0,        "min_v0_max": 5000.0,
+    "max_v0_min": 0.0,        "max_v0_max": 5000.0,
+    "min_v1_min": 0.0,        "min_v1_max": 5000.0,
+    "max_v1_min": 0.0,        "max_v1_max": 5000.0,
+
+    "min_t0_min": -40.0,      "min_t0_max": 125.0,
+    "max_t0_min": -40.0,      "max_t0_max": 125.0,
+    "min_t1_min": -40.0,      "min_t1_max": 125.0,
+    "max_t1_min": -40.0,      "max_t1_max": 125.0
+
+  },
+
+  "sensors": {
+
+    "min_sensor": -20,
+    "max_sensor": 20
+
+  }
+
+}
