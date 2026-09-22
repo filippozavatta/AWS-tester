@@ -37,6 +37,17 @@
     "min_sensor": -20,
     "max_sensor": 20
 
+  },
+
+  "batteries": {
+
+    "discharge_capacity_min": 600,  "discharge_capacity_max": 700,
+    "recharge_capacity_min": 100, "recharge_capacity_max": 200,
+    "discharge_voltage_min": 2500, "discharge_voltage_max": 4200,
+    "recharge_voltage_min": 2500, "recharge_voltage_max": 4200,
+    "sampled_voltage_min": 2500, "sampled_voltage_max": 4200,
+    "sampled_temperature_min": -10, "sampled_temperature_max":70
+
   }
 
 }
