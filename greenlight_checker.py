@@ -425,11 +425,11 @@ def main():
 
     for warning in warnings:
 
-        record['warnings'].append(warning.__dict__())
+        record['warnings'].append(warning.__dict__)
 
     for error in errors:
 
-        record['errors'].append(error.__dict__())
+        record['errors'].append(error.__dict__)
 
 
     # scrittura record
