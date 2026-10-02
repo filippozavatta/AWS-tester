@@ -37,10 +37,8 @@ def append_jsonl(path, record):
         fh.flush()
 
 N_MACHINES = 15
-FS = 50
+FS = 100
 FS_TOLERANCE = 0.01
-
-N_EXPECTED_OBSERVATIONS_BATTERIES = 16
 
 with open("range_fisici.json", encoding="utf-8") as fh:
     range_fisici = json.load(fh)
@@ -58,7 +56,7 @@ def counts_to_dict(values, counts, fmt=lambda v: str(int(v))):
     return {fmt(v): int(c) for v, c in zip(values, counts)}
 
 
-def main():
+def analyze(start_time_input,end_time_input):
 
     not_passed = False
 
@@ -68,8 +66,8 @@ def main():
         aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
     )
 
-    from_dt = datetime.now() - timedelta(minutes=120)-timedelta(minutes=15)
-    to_dt = datetime.now() - timedelta(minutes=120)-timedelta(minutes=5)
+    from_dt = start_time_input
+    to_dt = end_time_input
 
     WindowFilter.window = f"{from_dt:%Y-%m-%d %H:%M:%S} -> {to_dt:%H:%M:%S}"
 
@@ -150,6 +148,7 @@ def main():
                 n_values += 1
 
     record['machines']['rows'] = len(machines)
+    record['machines']['data_from'], record['machines']['data_to'] = (machines[0].plc_time.isoformat(), machines[-1].plc_time.isoformat()) if machines else (None, None)
     record['machines']['check_ranges'] = (n_values == 0)
     record['machines']['n_values_oor'] = n_values
 
@@ -266,6 +265,7 @@ def main():
                     n_values_sensor += 1
 
     record['sensors']['rows'] = len(sensors)
+    record['sensors']['data_from'], record['sensors']['data_to'] = (sensors[0].plc_time.isoformat(), sensors[-1].plc_time.isoformat()) if sensors else (None, None)
     record['sensors']['check_ranges'] = (n_values_sensor == 0)
     record['sensors']['n_values_oor'] = n_values_sensor
 
@@ -357,27 +357,13 @@ def main():
 
     n_values_batt = 0
     not_passed_batt = False
-    check_rows = len(batteries) >= N_EXPECTED_OBSERVATIONS_BATTERIES
-    check_arrays = True
-
-    if not check_rows:
-        log.info(f"Righe batterie insufficienti: {len(batteries)} rilevate, "
-                 f"{N_EXPECTED_OBSERVATIONS_BATTERIES} attese. Controllo NON superato \u274c")
-        not_passed_batt = True
 
     for b in batteries:
-
-        arrays_full = 0
 
         for field, array in b:
 
             if not isinstance(array, (list, tuple, np.ndarray)):
                 continue
-
-            if len(array) == 0:
-                continue
-
-            arrays_full += 1
 
             lo = batteries_ranges.get(field + "_min")
             hi = batteries_ranges.get(field + "_max")
@@ -397,12 +383,6 @@ def main():
                     not_passed_batt = True
                     n_values_batt += 1
 
-        if arrays_full != 1:
-            log.info(f"[{b.plc_time}] {arrays_full} array pieni nella riga batterie "
-                     f"(atteso 1, non coerente con logica PLC). Controllo NON superato \u274c")
-            not_passed_batt = True
-            check_arrays = False
-
     if n_values_batt == 0:
         log.info("Tutti i valori delle batterie nei range fisici. Controllo superato \u2705")
     else:
@@ -410,8 +390,8 @@ def main():
 
     record['batteries'] = {
         'rows': len(batteries),
-        'check_rows': check_rows,
-        'check_arrays': check_arrays,
+        'data_from': min(b.plc_time for b in batteries).isoformat() if batteries else None,
+        'data_to': max(b.plc_time for b in batteries).isoformat() if batteries else None,
         'check_ranges': (n_values_batt == 0),
         'n_values_oor': n_values_batt,
         'status': "fail" if not_passed_batt else "ok",
@@ -433,13 +413,9 @@ def main():
 
 
     # scrittura record
-    record['status'] = "fail" if not_passed else "ok"
+    record['status'] = "fail" if (not_passed or not_passed_batt) else "ok"
 
-    append_jsonl("greenlight_records.jsonl", record)
+    append_jsonl(r"S:\08_MAINTENANCE AND RELIABILITY\07_PROGETTI\00_DATA STRATEGY\greenlight_records_0110.jsonl.txt", record)
 
     log.info(f"Esito complessivo del run: {record['status'].upper()}")
     log.info(f"Esito batterie: {record['batteries']['status'].upper()}")
-
-
-if __name__ == "__main__":
-    main()

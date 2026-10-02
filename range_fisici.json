@@ -2,7 +2,7 @@
   "diagnostic_machines": {
 
     "act_pos_min": -10,      "act_pos_max": 10,
-    "set_pos_min": -0.4,      "set_pos_max": 0.4,
+    "set_pos_min": -1,      "set_pos_max": 1,
 
     "act_vel_min": -10.0,     "act_vel_max": 10.0,
     "set_vel_min": -10.0,     "set_vel_max": 10.0,

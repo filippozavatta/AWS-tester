@@ -1,7 +1,7 @@
 annotated-types==0.7.0
 boto3==1.43.2
 botocore==1.43.2
-isaac-s3-reader @ git+https://github.com/isaac-srl/AWS_manager.git@v1.9.1#subdirectory=s3-data-reader
+isaac-s3-reader @ git+https://github.com/isaac-srl/AWS_manager.git@v2.0.0#subdirectory=s3-data-reader
 jmespath==1.1.0
 matplotlib
 pydantic==2.13.3

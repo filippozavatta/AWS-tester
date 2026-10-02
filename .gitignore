@@ -222,3 +222,7 @@ __marimo__/
 *.jsonl
 
 jsonl_inspector
+
+*.log
+
+*.ipynb
