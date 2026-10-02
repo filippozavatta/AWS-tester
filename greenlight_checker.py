@@ -6,6 +6,7 @@ from time import time
 import numpy as np
 import json
 import logging
+from config import CONFIG, path
 
 
 class WindowFilter(logging.Filter):
@@ -21,7 +22,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(window)s] %(levelname)-7s %(message)s",
     handlers=[
-        logging.FileHandler("greenlight_checker.log", encoding="utf-8"),
+        logging.FileHandler(path("log_file"), encoding="utf-8"),
         logging.StreamHandler(),
     ],
 )
@@ -40,10 +41,12 @@ N_MACHINES = 15
 FS = 100
 FS_TOLERANCE = 0.01
 
-with open("range_fisici.json", encoding="utf-8") as fh:
+with open(path("range_fisici"), encoding="utf-8") as fh:
     range_fisici = json.load(fh)
 
-load_dotenv()
+load_dotenv(path("env_file"))
+
+os.makedirs(path("output_dir"), exist_ok=True)
 
 
 def unpack_sensors(group):
@@ -56,7 +59,7 @@ def counts_to_dict(values, counts, fmt=lambda v: str(int(v))):
     return {fmt(v): int(c) for v, c in zip(values, counts)}
 
 
-def analyze(start_time_input,end_time_input):
+def analyze(start_time_input,end_time_input,plant):
 
     not_passed = False
 
@@ -69,39 +72,40 @@ def analyze(start_time_input,end_time_input):
     from_dt = start_time_input
     to_dt = end_time_input
 
-    WindowFilter.window = f"{from_dt:%Y-%m-%d %H:%M:%S} -> {to_dt:%H:%M:%S}"
+    WindowFilter.window = f"{plant} {from_dt:%Y-%m-%d %H:%M:%S} -> {to_dt:%H:%M:%S}"
 
     machines = reader.read_diagnostic_machines(
-        building_id="LAB_EP20",
+        building_id=plant,
         from_dt=from_dt,
         to_dt=to_dt,
     )
 
     sensors = reader.read_sensors(
-        building_id="LAB_EP20",
+        building_id=plant,
         from_dt=from_dt,
         to_dt=to_dt,
     )
 
     errors = reader.read_errors(
-        building_id="LAB_EP20",
+        building_id=plant,
         from_dt=from_dt,
         to_dt=to_dt,
     )
 
     warnings = reader.read_warnings(
-        building_id="LAB_EP20",
+        building_id=plant,
         from_dt=from_dt,
         to_dt=to_dt,
     )
 
     batteries = reader.read_batteries(
-        building_id="LAB_EP20",
+        building_id=plant,
         from_dt=from_dt,
         to_dt=to_dt
     )
 
     record = {
+        "plant": plant,
         "executed_at": datetime.now().isoformat(),
         "window_from": from_dt.isoformat(),
         "window_to": to_dt.isoformat(),
@@ -415,7 +419,7 @@ def analyze(start_time_input,end_time_input):
     # scrittura record
     record['status'] = "fail" if (not_passed or not_passed_batt) else "ok"
 
-    append_jsonl(r"S:\08_MAINTENANCE AND RELIABILITY\07_PROGETTI\00_DATA STRATEGY\greenlight_records_0110.jsonl.txt", record)
+    append_jsonl(os.path.join(path("output_dir"), CONFIG["paths"]["jsonl_filename"].format(plant=plant)), record)
 
     log.info(f"Esito complessivo del run: {record['status'].upper()}")
     log.info(f"Esito batterie: {record['batteries']['status'].upper()}")

@@ -226,3 +226,5 @@ jsonl_inspector
 *.log
 
 *.ipynb
+# configurazione locale (copiare da configuration_example.json)
+configuration.json

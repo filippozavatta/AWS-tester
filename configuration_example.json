@@ -1,0 +1,24 @@
+{
+  "paths": {
+    "output_dir": "S:\\08_MAINTENANCE AND RELIABILITY\\07_PROGETTI\\00_DATA STRATEGY",
+    "jsonl_filename": "greenlight_records_{plant}.jsonl",
+    "log_file": "greenlight_checker.log",
+    "range_fisici": "range_fisici.json",
+    "env_file": ".env"
+  },
+
+  "plants": ["LAB_EP20"],
+
+  "analysis": {
+    "mode": "realtime",
+
+    "window": "10min",
+    "step": "5min",
+
+    "realtime_delay": "2min",
+    "realtime_utc": false,
+
+    "interval_start": "2026-09-28 11:00",
+    "interval_end": "2026-10-28 13:00"
+  }
+}
